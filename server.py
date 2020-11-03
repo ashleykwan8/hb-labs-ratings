@@ -54,7 +54,7 @@ def show_user(user_id):
 
     return render_template('user_details.html', user=user)
 
-@app.route('/user' method=["POST"])
+@app.route('/users', methods=["POST"])
 def register_user(): 
 
     email = request.form.get('email')
@@ -62,9 +62,31 @@ def register_user():
     user = crud.get_user_by_email(email)
 
     if user:
-        flash(f'Email already exists!')
+        flash('Email already exists!')
     else:
+        crud.create_user(email, password)
+        flash('Account created successfully!')
 
+    return redirect('/')
+
+@app.route('/users')
+def user_login():
+
+    email = request.form.get('login-email')
+    password = request.form.get('login-password')
+
+    user= crud.get_user_by_email(email)
+    login_password = crud.get_user_by_password(password)
+
+    session['user'] = User.user_id
+
+    if user:
+        flash('Logged in!')
+
+    else:
+        flash('Need to create an account!')
+
+    return redirect('/')
 
 if __name__ == '__main__':
     connect_to_db(app)
